@@ -24,4 +24,4 @@ jobs:
     - uses: actions/upload-artifact@v2
       with:
         name: app.war
-        path: https://maven.pkg.github.com/ilya-bukinich
+        path: staging
