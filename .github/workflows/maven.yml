@@ -19,9 +19,27 @@ jobs:
     - uses: actions/setup-java@v1
       with:
         java-version: 1.8
-    - run: mvn -B package --file pom.xml
-    - run: mkdir staging && cp target/*.war staging
-    - uses: actions/upload-artifact@v2
+        
+    - name: release
+      uses: actions/create-release@v1
+      id: create_release
       with:
-        name: app.war
-        path: staging
+        draft: false
+        prerelease: false
+        release_name: ${{ github.sha }}
+        tag_name: ${{ github.sha }}
+        body_path: Readme.md
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+    
+    - run: mvn -B package --file pom.xml
+
+    - name: upload artifact
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: target/*.war
+        asset_name: app.war
+        asset_content_type: application/gzip
